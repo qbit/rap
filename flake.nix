@@ -21,12 +21,12 @@
           pkgs = nixpkgsFor.${system};
         in
         {
-          rap = pkgs.buildGoModule {
+          rap = pkgs.buildGo123Module {
             pname = "rap";
             version = "v0.0.0";
             src = ./.;
 
-            vendorHash = pkgs.lib.fakeSha256;
+            vendorHash = "sha256-Crp9MeV2OKZ+oWuLyG+TEujv9UHLWNvyjDjKGGJLXuQ=";
           };
         });
 
