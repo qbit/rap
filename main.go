@@ -62,8 +62,10 @@ func main() {
 	}
 	targetURL := flag.String("target", "http://localhost:3000", "Target URL to proxy to (e.g., http://localhost:8080)")
 	domain := flag.String("domain", "openbsd.app", "Domain name for the certificate")
-	certListen := flag.String("http", ":8080", "Listen string for ACME http server")
-	httpsListen := flag.String("https", ":4343", "Listen string for https server")
+	certListen := flag.String("http", "127.0.0.1:8080", "Listen string for ACME http server")
+	certListen6 := flag.String("http6", "[::1]:8080", "Listen string for ipv6 ACME http server")
+	httpsListen := flag.String("https", "127.0.0.1:4343", "Listen string for https server")
+	httpsListen6 := flag.String("https6", "[::1]:4343", "Listen string for ipv6 https server")
 	flag.Parse()
 
 	target, err := url.Parse(*targetURL)
@@ -88,9 +90,16 @@ func main() {
 		Handler:   Logger(proxy),
 		TLSConfig: certManager.TLSConfig(),
 	}
+	server6 := &http.Server{
+		Addr:      *httpsListen6,
+		Handler:   Logger(proxy),
+		TLSConfig: certManager.TLSConfig(),
+	}
 
 	go http.ListenAndServe(*certListen, certManager.HTTPHandler(nil))
+	go http.ListenAndServe(*certListen6, certManager.HTTPHandler(nil))
 
 	log.Printf("Starting reverse proxy for %s on %s\n", *targetURL, *domain)
-	log.Fatal(server.ListenAndServeTLS("", ""))
+	go log.Fatal(server.ListenAndServeTLS("", ""))
+	log.Fatal(server6.ListenAndServeTLS("", ""))
 }
