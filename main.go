@@ -100,6 +100,6 @@ func main() {
 	go http.ListenAndServe(*certListen6, certManager.HTTPHandler(nil))
 
 	log.Printf("Starting reverse proxy for %s on %s\n", *targetURL, *domain)
-	go log.Fatal(server.ListenAndServeTLS("", ""))
+	go server.ListenAndServeTLS("", "")
 	log.Fatal(server6.ListenAndServeTLS("", ""))
 }
